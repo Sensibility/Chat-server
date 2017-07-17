@@ -1,3 +1,6 @@
 #test file
 client.go
 test.go
+
+#compiled binary
+server
