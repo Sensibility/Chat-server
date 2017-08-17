@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+type address struct {
+	Network string;
+	String string;
+}
+
 func CheckError(err error) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
@@ -25,14 +30,25 @@ func compareIPs(a net.IP, b net.IP) bool{
 	return true
 }
 
-func checkHost(host *net.UDPAddr, knownHosts []net.UDPAddr) bool {
+func checkHost(host *net.UDPAddr, knownHosts []*net.UDPAddr) bool {
 	for _, knownHost := range knownHosts {
-		fmt.Println("Comparing '", host, "' to '", knownHost, "'")
-		if compareIPs((*host).IP, knownHost.IP) {
+		if compareIPs(host.IP, knownHost.IP) {
 			return true
 		}
 	}
 	return false
+}
+
+func relayMessage(msg []byte, sender net.IP, clients []*net.UDPAddr, server *net.UDPConn) {
+	for _, client := range clients {
+		if !compareIPs(client.IP, sender) {
+			_, err := server.WriteToUDP(msg, client)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error writing message from %s to %s: %s", sender, client, err)
+			}
+
+		}
+	}
 }
 
 func main() {
@@ -45,21 +61,21 @@ func main() {
 
 	buffer := make([]byte, 1024)
 
-	var knownHosts []net.UDPAddr
+	var knownHosts []*net.UDPAddr
 
 	for {
 		n,addr,err := ServerConn.ReadFromUDP(buffer)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		}
 		fmt.Println("Received ",string(buffer[0:n]), " from ",addr)
 		if !checkHost(addr, knownHosts) {
-			knownHosts = append(knownHosts, *addr)
+			knownHosts = append(knownHosts, addr)
 			fmt.Println("New host added: ", addr, "\n Known Hosts:")
 			for _, host := range knownHosts {
 				fmt.Println("\t", host)
 			}
-
 		}
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-		}
+		relayMessage(buffer, addr.IP, knownHosts, ServerConn)
 	}
 }
