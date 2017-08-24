@@ -3,5 +3,6 @@ client.go
 test.go
 
 #compiled binary
+Chat-server
 server
 test
