@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"net/http"
+    "io"
+    "net/http"
 
-	"golang.org/x/net/websocket"
+    "golang.org/x/net/websocket"
 )
 
 // Echo the data received on the WebSocket.
