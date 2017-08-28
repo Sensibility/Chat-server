@@ -1,8 +1,9 @@
-#test file
-client.go
-test.go
-
 #compiled binary
 Chat-server
 server
 test
+
+#sublime files
+*.sublime-project
+*.sublime-workspace
+
