@@ -37,7 +37,6 @@ async def handler(websocket, path):
 		for client in clients.keys():
 			print("\t"+str(client))
 	try:
-		await asyncio.wait([ws[0].send("Hello!") for ws in clients.values()])
 		#consumer_task = asyncio.ensure_future(receive(websocket))
 		producer_task = asyncio.ensure_future(relay(websocket))
 		done, pending = await asyncio.wait(
