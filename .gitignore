@@ -7,3 +7,6 @@ test
 *.sublime-project
 *.sublime-workspace
 
+#python
+__pycache__/
+
