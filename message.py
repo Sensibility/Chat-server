@@ -1,4 +1,4 @@
-from json import loads
+from json import loads, dumps
 class Message:
 	"""Represents a single message sent from a client"""
 	def __init__(self, msg, client):
@@ -20,7 +20,7 @@ class Message:
 		return "Sent from "+self.IP+" ("+self.nickName+"):\n{\n\ttype: "+self.type+"\n\ttext: '"+self.text+"'\n\tdate: "+str(self.date)+"\n}"
 
 	def json(self):
-		return '{ "type": "'+self.type+'", "text": "'+self.text+'", "date": "'+str(self.date)+'", "sender": "'+self.nickName+'" }'
+		return dumps({"type": self.type, "text": self.text, "date": self.date, "sender": self.nickName})
 
 
 		
