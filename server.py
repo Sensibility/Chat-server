@@ -22,8 +22,9 @@ async def handler(websocket, path):
 	global clients
 	clients.add(websocket)
 	try:
-		await asyncio.wait([ws.send("Hello!") for ws in clients])
-		await asyncio.sleep(10)
+		while True:
+			await asyncio.wait([ws.send("Hello!") for ws in clients])
+			await asyncio.sleep(10)
 	finally:
 		clients.remove(websocket)
 
