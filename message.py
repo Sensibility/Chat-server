@@ -10,7 +10,6 @@ class Message:
 			self.type = msg["type"]
 			self.text = msg["text"]
 			self.date = msg["date"]
-			print(type(self.date))
 		except Exception as e:
 			print(e)
 			self.type = "error"
@@ -18,10 +17,10 @@ class Message:
 			self.date = "Now-ish"
 
 	def str(self):
-		return "Sent from "+self.IP+" ("+self.nickName+"):\n{\n\ttype: "+self.type+"\n\ttext: '"+self.text+"'\n\tdate: "+self.date+"\n}"
+		return "Sent from "+self.IP+" ("+self.nickName+"):\n{\n\ttype: "+self.type+"\n\ttext: '"+self.text+"'\n\tdate: "+str(self.date)+"\n}"
 
 	def json(self):
-		return "{ 'type': '"+self.type+"', 'text': '"+self.text+"', 'date': '"+self.date+"', 'sender': '"+self.nickName+"' }"
+		return "{ 'type': '"+self.type+"', 'text': '"+self.text+"', 'date': '"+str(self.date)+"', 'sender': '"+self.nickName+"' }"
 
 
 		
