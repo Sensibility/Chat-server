@@ -24,7 +24,7 @@ async def relay(websocket):
 		
 		if message.type == "textmsg":
 			for client in clients:
-				clients[client].send(message.json())
+				clients[client][0].send(message.json())
 
 
 async def handler(websocket, path):
