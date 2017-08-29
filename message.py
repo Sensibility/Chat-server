@@ -5,7 +5,7 @@ class Message:
 		self.IP = client[0]
 		self.nickName = client[1]
 
-		msg = json.loads(msg)
+		msg = loads(msg)
 		try:
 			self.type = msg["type"]
 			self.text = msg["text"]
