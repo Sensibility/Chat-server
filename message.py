@@ -10,6 +10,7 @@ class Message:
 			self.type = msg["type"]
 			self.text = msg["text"]
 			self.date = msg["date"]
+			print(type(self.date))
 		except Exception as e:
 			print(e)
 			self.type = "error"
