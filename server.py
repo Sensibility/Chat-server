@@ -23,7 +23,7 @@ async def relay(websocket):
 		message = Message(message.json(), (websocket.remote_address[0], clients[websocket.remote_address[0]]))
 		
 		if message.type == "textmsg":
-			for client in clients.keys():
+			for client in clients:
 				if client != websocket.remote_address[0]:
 					clients[client].send(message.json())
 
@@ -37,7 +37,7 @@ async def handler(websocket, path):
 		for client in clients.keys():
 			print("\t"+str(client))
 	try:
-		await asyncio.wait([ws.send("Hello!") for ws in clients])
+		await asyncio.wait([ws.send("Hello!") for ws in clients.values()])
 		#consumer_task = asyncio.ensure_future(receive(websocket))
 		producer_task = asyncio.ensure_future(relay(websocket))
 		done, pending = await asyncio.wait(
