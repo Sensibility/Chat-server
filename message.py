@@ -20,7 +20,9 @@ class Message:
 		return "Sent from "+self.IP+" ("+self.nickName+"):\n{\n\ttype: "+self.type+"\n\ttext: '"+self.text+"'\n\tdate: "+str(self.date)+"\n}"
 
 	def json(self):
-		return '{ "type": "'+self.type+'", "text": "'+self.text+'", "date": "'+str(self.date)+'", "sender": "'+self.nickName+'" }'
+		string = '{ "type": "'+self.type+'", "text": "'+self.text+'", "date": "'+str(self.date)+'", "sender": "'+self.nickName+'" }'
+		print(string)
+		return string
 
 
 		
