@@ -17,14 +17,15 @@ async def receive(websocket):
 async def relay(websocket):
 	while True:
 		message = await websocket.recv()
+		print("recieved message from "+websocket.remote_address[0]+": "+message)
 		message = Message(message, (websocket.remote_address[0], "Unkown"))
 		if message.type == "login":
 			clients[websocket.remote_address[0]][1] = message.text
-		message = Message(message.json(), (websocket.remote_address[0], clients[websocket.remote_address[0]]))
+		message = Message(message.json(), (websocket.remote_address[0], clients[websocket.remote_address[0]][1]))
 		
 		if message.type == "textmsg":
 			for client in clients.values():
-				client.send(message.json())
+				await client[0].send(message.json())
 
 
 async def handler(websocket, path):
