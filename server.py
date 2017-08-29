@@ -41,7 +41,7 @@ async def handler(websocket, path):
 		#consumer_task = asyncio.ensure_future(receive(websocket))
 		producer_task = asyncio.ensure_future(relay(websocket))
 		done, pending = await asyncio.wait(
-			[consumer_task, producer_task],
+			[producer_task],
 			return_when=asyncio.FIRST_COMPLETED,
 		)
 
