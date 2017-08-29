@@ -34,8 +34,8 @@ async def handler(websocket, path):
 		clients[websocket.remote_address] = [websocket, "Unkown"]
 		print("[I] Added a new client - "+websocket.remote_address)
 		print("[I] Dumping client list: ")
-			for client in clients.keys():
-				print("\t"+str(client))
+		for client in clients.keys():
+			print("\t"+str(client))
 	try:
 		await asyncio.wait([ws.send("Hello!") for ws in clients])
 		#consumer_task = asyncio.ensure_future(receive(websocket))
