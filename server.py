@@ -11,34 +11,28 @@ logger.addHandler(StreamHandler())
 
 clients = dict()
 
-def IPtoStr(ip):
-	string = ""
-	for b in ip:
-		string += str(b)
-	return string
-
 async def receive(websocket):
 	pass
 
 async def relay(websocket):
 	while True:
 		message = await websocket.recv()
-		message = Message(message, (IPtoStr(websocket.remote_address), "Unkown"))
+		message = Message(message, (websocket.remote_address[0], "Unkown"))
 		if message.type == "login":
-			clients[IPtoStr(websocket.remote_address)][1] = message.text
-		message = Message(message.json(), (IPtoStr(websocket.remote_address), clients[IPtoStr(websocket.remote_address)]))
+			clients[websocket.remote_address[0]][1] = message.text
+		message = Message(message.json(), (websocket.remote_address[0], clients[websocket.remote_address[0]]))
 		
 		if message.type == "textmsg":
 			for client in clients.keys():
-				if client != IPtoStr(websocket.remote_address):
+				if client != websocket.remote_address[0]:
 					clients[client].send(message.json())
 
 
 async def handler(websocket, path):
 	global clients
-	if IPtoStr(websocket.remote_address) not in clients:
-		clients[IPtoStr(websocket.remote_address)] = [websocket, "Unkown"]
-		print("[I] Added a new client - "+IPtoStr(websocket.remote_address))
+	if websocket.remote_address[0] not in clients:
+		clients[websocket.remote_address[0]] = [websocket, "Unkown"]
+		print("[I] Added a new client - "+websocket.remote_address[0])
 		print("[I] Dumping client list: ")
 		for client in clients.keys():
 			print("\t"+str(client))
