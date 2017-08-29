@@ -53,8 +53,8 @@ async def handler(websocket, path):
 
 		for task in pending:
 			task.cancel()
-	finally:
-		clients.remove(websocket)
+	except Exception as e:
+		print(e)
 
 start_server = websockets.serve(handler, host='', port=6969)
 
