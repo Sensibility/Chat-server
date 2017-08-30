@@ -11,9 +11,6 @@ logger.addHandler(StreamHandler())
 
 clients = dict()
 
-async def receive(websocket):
-	pass
-
 async def relay(websocket):
 	while True:
 		message = await websocket.recv()
@@ -37,7 +34,6 @@ async def handler(websocket, path):
 		for client in clients.keys():
 			print("\t"+str(client))
 	try:
-		#consumer_task = asyncio.ensure_future(receive(websocket))
 		producer_task = asyncio.ensure_future(relay(websocket))
 		done, pending = await asyncio.wait(
 			[producer_task],
@@ -46,10 +42,12 @@ async def handler(websocket, path):
 
 		for task in pending:
 			task.cancel()
-	except Exception as e:
-		print(e)
+	finally:
+		print("[I] User disconnected from "+websocket.remote_address[0])
+		if not clients.pop(websocket.remote_address[0], False):
+			print("[W] Disconnection from unregistered address - something wicked happened...")
 
-start_server = websockets.serve(handler, host='', port=6969)
+start_server = websockets.serve(handler, host='localhost', port=6969)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
