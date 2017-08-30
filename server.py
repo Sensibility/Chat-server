@@ -47,7 +47,7 @@ async def handler(websocket, path):
 		if not clients.pop(websocket.remote_address[0], False):
 			print("[W] Disconnection from unregistered address - something wicked happened...")
 
-start_server = websockets.serve(handler, host='localhost', port=6969)
+start_server = websockets.serve(handler, host='', port=6969)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
