@@ -13,7 +13,7 @@ class Message:
 			self.text = msg["text"]
 			self.date = datetime.now()
 		except Exception as e:
-			print(e)
+			print("[E] Malformed message; possible json parse error?")
 			self.type = "error"
 			self.text = str(e)
 			self.date = "Now-ish"
@@ -22,7 +22,8 @@ class Message:
 		return "Sent from "+self.IP+" ("+self.nickName+"):\n{\n\ttype: "+self.type+"\n\ttext: '"+self.text+"'\n\tdate: "+str(self.date)+"\n}"
 
 	def json(self):
-		return dumps({"type": self.type, "text": self.text, "date": str(self.date.timestamp()*1000), "sender": self.nickName})
+		return dumps({"type": self.type, "text": self.text, "date": str(self.date.timestamp()), "sender": self.nickName})
 
-
+	def jsonify(names, values):
+		return dumps({names[i]: values[i] for i in range(len(names))})
 		

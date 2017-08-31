@@ -4,6 +4,7 @@ import asyncio
 import websockets
 from logging import getLogger, INFO, StreamHandler
 from message import Message
+from database import Database
 
 logger = getLogger('websockets')
 logger.setLevel(INFO)
@@ -11,20 +12,54 @@ logger.addHandler(StreamHandler())
 
 clients = dict()
 
+#Open a database connection
+try:
+	db = Database("chat")
+except Exception as e:
+	print("[E] Connection to database failed -")
+	print("\t"+str(e))
+	print("[W] Continuing without database...")
+	db = False
+
+
 async def relay(websocket):
 	"""This function waits for messages from every connected client
 	('websocket' is one client connection and the function is called asynchronously for each client)
 	and forwards them to all other clients."""
+	global db
 	while True:
+
+		#first wait for a message
 		message = await websocket.recv()
-		print("recieved message from "+websocket.remote_address[0]+": "+message)
-		message = Message(message, (websocket.remote_address[0], "Unkown"))
+		username = clients[websocket.remote_address[0]][1]
+		print("[I] Recieved message from "+websocket.remote_address[0]+" ("+username+")")
+		message = Message(message, (websocket.remote_address[0], username))
+
+		#if it's a login message, store their nickname for later and send them some messages they might've missed.
 		if message.type == "login":
-			clients[websocket.remote_address[0]][1] = message.text		
+			
+			clients[websocket.remote_address[0]][1] = message.text
+
+			#send messages to 'em if the database was connected to successfully
+			if db:
+				try:
+					for msg in db.getMessages():
+						await websocket.send(Message.jsonify(("sender", "date", "text"), msg))
+				except Exception as e:
+					del db
+					db = False
+
+
+		#if it's a  text message, store it to the database and send it to everyone else
 		elif message.type == "textmsg":
-			message.nickName = clients[message.IP][1]
 			for client in clients.values():
 				await client[0].send(message.json())
+			if db:
+				try:
+					db.storeMessage(message)
+				except Exception as e:
+					del db
+					db = False
 		else:
 			print("[W] Malformed message recieved from "+websocket.remote_address[0])
 
@@ -49,8 +84,9 @@ async def handler(websocket, path):
 
 		for task in pending:
 			task.cancel()
-	finally:
+	except:
 		print("[I] User disconnected from "+websocket.remote_address[0])
+	finally:
 		if not clients.pop(websocket.remote_address[0], False):
 			print("[W] Disconnection from unregistered address - something wicked happened...")
 
