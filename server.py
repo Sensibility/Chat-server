@@ -12,20 +12,27 @@ logger.addHandler(StreamHandler())
 clients = dict()
 
 async def relay(websocket):
+	"""This function waits for messages from every connected client
+	('websocket' is one client connection and the function is called asynchronously for each client)
+	and forwards them to all other clients."""
 	while True:
 		message = await websocket.recv()
 		print("recieved message from "+websocket.remote_address[0]+": "+message)
 		message = Message(message, (websocket.remote_address[0], "Unkown"))
 		if message.type == "login":
-			clients[websocket.remote_address[0]][1] = message.text
-		message = Message(message.json(), (websocket.remote_address[0], clients[websocket.remote_address[0]][1]))
-		
-		if message.type == "textmsg":
+			clients[websocket.remote_address[0]][1] = message.text		
+		elif message.type == "textmsg":
+			message.nickName = clients[message.IP][1]
 			for client in clients.values():
 				await client[0].send(message.json())
+		else:
+			print("[W] Malformed message recieved from "+websocket.remote_address[0])
 
 
 async def handler(websocket, path):
+	"""This is called when a client connects to the server.
+	'websocket' is a socket object generated for us that is connected to the client, and 'path' is the client's socket request path.
+	This function handles keeping track of clients' connections and disconnections and passes messages off to 'relay()'"""
 	global clients
 	if websocket.remote_address[0] not in clients:
 		clients[websocket.remote_address[0]] = [websocket, "Unkown"]
