@@ -10,7 +10,7 @@ class Message:
 		msg = loads(msg)
 		try:
 			self.type = msg["type"]
-			self.text = msg["text"]
+			self.text = msg["text"].strip()
 			self.date = datetime.now()
 		except Exception as e:
 			print("[E] Malformed message; possible json parse error?")
