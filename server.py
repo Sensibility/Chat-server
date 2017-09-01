@@ -30,7 +30,10 @@ async def relay(websocket):
 	while True:
 
 		#first wait for a message
-		message = await websocket.recv()
+		try:
+			message = await websocket.recv()
+		except:
+			break
 		addr = websocket.remote_address[0]
 		username = clients[addr][1]
 		print("[I] Recieved message from "+addr+" ("+username+")")
@@ -85,15 +88,9 @@ async def handler(websocket, path):
 	if websocket.remote_address[0] not in clients:
 		clients[websocket.remote_address[0]] = [websocket, "Unkown"]
 		print("[I] Added a new client - "+websocket.remote_address[0])
-		print("[I] Dumping client list: ")
-		for client in clients.keys():
-			print("\t"+str(client))
 	try:
 		producer_task = asyncio.ensure_future(relay(websocket))
-		done, pending = await asyncio.wait(
-			[producer_task],
-			return_when=asyncio.FIRST_COMPLETED,
-		)
+		done, pending = await asyncio.wait(producer_task)
 
 		for task in pending:
 			task.cancel()
