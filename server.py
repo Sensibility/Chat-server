@@ -40,7 +40,7 @@ async def relay(websocket):
 			print("it was a voip packet!")
 			for client in clients:
 				#TODO- this: if client != addr:
-				clients[client][0].send(message)
+				await clients[client][0].send(message)
 
 		#... but if it's a string it's either login info or a text message
 		elif isinstance(message, str):
