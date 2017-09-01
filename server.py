@@ -90,7 +90,10 @@ async def handler(websocket, path):
 		print("[I] Added a new client - "+websocket.remote_address[0])
 	try:
 		producer_task = asyncio.ensure_future(relay(websocket))
-		done, pending = await asyncio.wait(producer_task)
+		done, pending = await asyncio.wait(
+			[producer_task],
+			return_when=asyncio.FIRST_COMPLETED,
+		)
 
 		for task in pending:
 			task.cancel()
