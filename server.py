@@ -38,6 +38,9 @@ async def relay(websocket):
 		#If it's binary data, it's probably a voip packet, so try that
 		if isinstance(message, bytes):
 			print("it was a voip packet!")
+			for client in clients:
+				#TODO- this: if client != addr:
+				clients[client][0].send(message)
 
 		#... but if it's a string it's either login info or a text message
 		elif isinstance(message, str):
