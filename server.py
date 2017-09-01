@@ -31,37 +31,47 @@ async def relay(websocket):
 
 		#first wait for a message
 		message = await websocket.recv()
-		username = clients[websocket.remote_address[0]][1]
-		print("[I] Recieved message from "+websocket.remote_address[0]+" ("+username+")")
-		message = Message(message, (websocket.remote_address[0], username))
+		addr = websocket.remote_address[0]
+		username = clients[addr][1]
+		print("[I] Recieved message from "+addr+" ("+username+")")
 
-		#if it's a login message, store their nickname for later and send them some messages they might've missed.
-		if message.type == "login":
-			
-			clients[websocket.remote_address[0]][1] = message.text
+		#If it's binary data, it's probably a voip packet, so try that
+		if isinstance(message, bytes):
+			print("it was a voip packet!")
 
-			#send messages to 'em if the database was connected to successfully
-			if db:
-				try:
-					for msg in db.getMessages():
-						await websocket.send(Message.jsonify(("sender", "date", "text"), msg))
-				except Exception as e:
-					del db
-					db = False
+		#... but if it's a string it's either login info or a text message
+		elif isinstance(message, str):
+			message = Message(message, (addr, username))
+
+			#if it's a login message, store their nickname for later and send them some messages they might've missed.
+			if message.type == "login":
+				
+				clients[websocket.remote_address[0]][1] = message.text
+
+				#send messages to 'em if the database was connected to successfully
+				if db:
+					try:
+						for msg in db.getMessages():
+							await websocket.send(Message.jsonify(("sender", "date", "text"), msg))
+					except Exception as e:
+						del db
+						db = False
 
 
-		#if it's a  text message, store it to the database and send it to everyone else
-		elif message.type == "textmsg":
-			for client in clients.values():
-				await client[0].send(message.json())
-			if db:
-				try:
-					db.storeMessage(message)
-				except Exception as e:
-					del db
-					db = False
+			#if it's a  text message, store it to the database and send it to everyone else
+			elif message.type == "textmsg":
+				for client in clients.values():
+					await client[0].send(message.json())
+				if db:
+					try:
+						db.storeMessage(message)
+					except Exception as e:
+						del db
+						db = False
+			else:
+				print("[W] Malformed message recieved from "+addr)
 		else:
-			print("[W] Malformed message recieved from "+websocket.remote_address[0])
+			print("[E] Unknown error occured during message receipt from "+addr)
 
 
 async def handler(websocket, path):
