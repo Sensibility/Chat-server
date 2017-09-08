@@ -2,13 +2,8 @@
 
 import asyncio
 import websockets
-from logging import getLogger, INFO, StreamHandler
 from message import Message
 from database import Database
-
-logger = getLogger('websockets')
-logger.setLevel(INFO)
-logger.addHandler(StreamHandler())
 
 clients = dict()
 
