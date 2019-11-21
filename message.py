@@ -26,4 +26,4 @@ class Message:
 
 	def jsonify(names, values):
 		return dumps({names[i]: values[i] for i in range(len(names))}, default=lambda bad: bad.timestamp() if isinstance(bad, datetime) else None)
-		
+

@@ -2,7 +2,7 @@ import psycopg2
 
 class Database:
 	"""Abstracts database operations for the chat server. Always expects a postgresql server with user 'chat' having read/write permissions for rows in 'Message' table."""
-	
+
 	def __init__(self, dbname):
 		"""Initializes database connection with the database named 'dbname'."""
 		self.connection = psycopg2.connect("dbname="+dbname+" user=chat")
@@ -33,4 +33,3 @@ class Database:
 		finally:
 			cursor.close()
 
-		
