@@ -12,7 +12,7 @@ class Message:
 			self.type = msg["type"]
 			self.text = msg["text"].strip()
 			self.date = datetime.now()
-		except Exception as e:
+		except (TypeError, KeyError, AttributeError) as e:
 			print("[E] Malformed message; possible json parse error?")
 			self.type = "error"
 			self.text = str(e)
